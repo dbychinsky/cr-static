@@ -75,6 +75,7 @@ const App: React.FC = () => {
     const [selectedMonth, setSelectedMonth] = useState<Date | null>(new Date())
     const [tab, setTab] = useState(0)
 
+
     const formatDate = (iso: string) => {
         if (!iso) return ''
         const d = new Date(iso)
