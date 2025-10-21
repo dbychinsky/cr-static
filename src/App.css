@@ -1,42 +1,72 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+h4 {
+    font-size: 24px !important;
+    margin-bottom: 10px !important;
+}
+
+h6 {
+    font-size: 16px !important;
+    margin-bottom: 10px !important;
+}
+
+.css-ds0qfq-MuiContainer-root {
+    padding: 20px 10px !important;
+}
+
+.css-1lid6ur-MuiPaper-root {
+    margin-bottom: 16px !important;
+}
+
+
+.form {
+    max-width: 360px !important;
+    width: 100% !important;
+}
+
+.css-1f89vao-MuiStack-root {
+    display: flex !important;
+    flex-flow: column nowrap !important;
+    gap: 20px;
+}
+
+.summa {
+    display: flex !important;
+    flex-flow: row nowrap !important;
+}
+
+.css-1f89vao-MuiStack-root > :not(style) ~ :not(style) {
+    margin: 0 !important;
+}
+
+.css-cie2x-MuiTableCell-root {
+    padding: 8px !important;
+    font-size: 12px !important;
+}
+
+.css-1oa658l-MuiTableCell-root,
+.css-dcstex-MuiTableCell-root,
+.css-1lwn3zq-MuiTableCell-root,
+.css-12x85rv-MuiTableCell-root,
+.css-qkz8se-MuiTableCell-root,
+.css-107qrd1-MuiTableCell-root,
+.css-gwwvla-MuiTableCell-root {
+    padding: 8px 4px 8px 8px !important;
+    font-size: 12px !important;
+}
+
+
+.css-5imdd-MuiButtonBase-root-MuiButton-root {
+    min-width: 0 !important;
+    padding: 3px !important;
+    border: none !important;
+}
+
+button.css-5imdd-MuiButtonBase-root-MuiButton-root {
+    padding-left: 0 !important;
 }
 
 .logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
+    padding-left: 34px;
+    background: url("assets/logotype.png") -5px -5px  no-repeat;
+    background-size: 36px;
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
 }

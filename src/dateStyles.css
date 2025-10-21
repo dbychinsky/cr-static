@@ -1,0 +1,19 @@
+.MuiInputBase-root {
+    color: white !important;
+}
+
+.MuiSvgIcon-root {
+    color: white !important; /* белая иконка календаря */
+}
+
+.MuiOutlinedInput-notchedOutline {
+    border-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.MuiInputLabel-root {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+    border-color: white !important;
+}

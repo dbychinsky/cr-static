@@ -1,8 +1,36 @@
 import React, { useEffect, useState } from 'react'
+import {
+    Container,
+    Typography,
+    TextField,
+    Button,
+    Select,
+    MenuItem,
+    Checkbox,
+    FormControlLabel,
+    InputLabel,
+    FormControl,
+    Table,
+    TableHead,
+    TableBody,
+    TableRow,
+    TableCell,
+    TableFooter,
+    Paper,
+    Stack,
+} from '@mui/material'
+import { Delete, Upload, Download, CalendarToday } from '@mui/icons-material'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { DatePicker } from '@mui/x-date-pickers/DatePicker'
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
+import { ru } from 'date-fns/locale'
+import { saveRecords, loadRecords, addRecord } from './Service'
+import './dateStyles.css'
 import './App.css'
-import { saveRecords, loadRecords } from './Service'
+import { styled } from '@mui/material/styles'
 
 export interface TradeRecord {
+    id?: number
     date: string
     broker: string
     profit: number
@@ -18,41 +46,83 @@ interface MonthlySummary {
     difference: number
 }
 
-const App: React.FC = () => {
-    const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0])
-    const [broker, setBroker] = useState<string>('Брокер 1')
-    const [isProfit, setIsProfit] = useState<boolean>(true)
-    const [amount, setAmount] = useState<string>('')
-    const [records, setRecords] = useState<TradeRecord[]>([])
+// Белая иконка календаря
+const WhiteCalendarIcon = styled(CalendarToday)({
+    color: 'white',
+})
 
-    // === Загрузка из localStorage ===
+// Кастомизация TextField внутри DatePicker
+const whiteTextField = {
+    '& .MuiInputBase-root': {
+        color: 'white',
+    },
+    '& .MuiOutlinedInput-notchedOutline': {
+        borderColor: '#ccc',
+    },
+    '&:hover .MuiOutlinedInput-notchedOutline': {
+        borderColor: '#fff',
+    },
+    '& .MuiSvgIcon-root': {
+        color: 'white',
+    },
+    '& label': {
+        color: '#ccc',
+    },
+}
+
+const App: React.FC = () => {
+    const getCurrentMonth = () => {
+        const d = new Date()
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+    }
+
+    const [date, setDate] = useState<Date | null>(new Date())
+    const [broker, setBroker] = useState('Insider trade')
+    const [isProfit, setIsProfit] = useState(true)
+    const [amount, setAmount] = useState('')
+    const [records, setRecords] = useState<TradeRecord[]>([])
+    const [selectedMonth, setSelectedMonth] = useState<Date | null>(new Date())
+
+    const formatDate = (iso: string) => {
+        if (!iso) return ''
+        const d = new Date(iso)
+        if (isNaN(d.getTime())) return iso
+        return d.toLocaleDateString('ru-RU')
+    }
+
     useEffect(() => {
-        const saved = loadRecords()
-        if (saved.length) setRecords(saved)
+        ;(async () => {
+            const saved = await loadRecords()
+            setRecords(saved)
+        })()
     }, [])
 
-    // === Сохранение при изменении ===
-    useEffect(() => {
-        saveRecords(records)
-    }, [records])
-
-    const handleAdd = () => {
+    const handleAdd = async () => {
+        if (!date) return alert('Выберите дату')
         const num = parseFloat(amount.replace(',', '.'))
         if (isNaN(num)) return alert('Введите число')
 
+        const iso = date.toISOString().split('T')[0]
         const record: TradeRecord = {
-            date,
+            date: iso,
             broker,
             profit: isProfit ? num : 0,
             loss: !isProfit ? num : 0,
             difference: isProfit ? num : -num,
         }
 
-        setRecords(prev => [...prev, record])
+        const updated = [...records, record]
+        setRecords(updated)
+        await addRecord(record)
         setAmount('')
     }
 
-    // === 📤 Экспорт данных в файл ===
+    const handleDelete = async (index: number) => {
+        const newRecords = records.filter((_, i) => i !== index)
+        setRecords(newRecords)
+        await saveRecords(newRecords)
+    }
+
     const handleExport = () => {
         const blob = new Blob([JSON.stringify(records, null, 2)], { type: 'application/json' })
         const url = URL.createObjectURL(blob)
@@ -63,169 +133,223 @@ const App: React.FC = () => {
         URL.revokeObjectURL(url)
     }
 
-    // === 📥 Импорт данных из файла ===
-    const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
         if (!file) return
         const reader = new FileReader()
-        reader.onload = event => {
+        reader.onload = async event => {
             try {
                 const data = JSON.parse(event.target?.result as string)
                 if (!Array.isArray(data)) throw new Error('Неверный формат')
+                await saveRecords(data)
                 setRecords(data)
-                alert('✅ Данные успешно импортированы!')
-            } catch (err) {
+                alert('✅ Данные импортированы')
+            } catch {
                 alert('Ошибка при чтении файла')
             }
         }
         reader.readAsText(file)
-        e.target.value = '' // очищаем input
+        e.target.value = ''
     }
 
-    // === Формат даты ===
-    const formatDate = (isoDate: string): string => {
-        const [year, month, day] = isoDate.split('-')
-        return `${day}.${month}.${year}`
-    }
-
-    // === Подсчёт итогов ===
-    const totalProfit = records.reduce((s, r) => s + r.profit, 0)
-    const totalLoss = records.reduce((s, r) => s + r.loss, 0)
+    const currentMonth = getCurrentMonth()
+    const currentMonthRecords = records.filter(r => r.date.startsWith(currentMonth))
+    const totalProfit = currentMonthRecords.reduce((s, r) => s + r.profit, 0)
+    const totalLoss = currentMonthRecords.reduce((s, r) => s + r.loss, 0)
     const totalDiff = totalProfit - totalLoss
 
-    // === Группировка по месяцам ===
-    const monthlySummary: MonthlySummary[] = []
     const grouped: Record<string, MonthlySummary> = {}
-
     for (const r of records) {
         const [year, month] = r.date.split('-')
         const key = `${year}-${month}_${r.broker}`
         if (!grouped[key]) {
-            grouped[key] = {
-                month: `${year}-${month}`,
-                broker: r.broker,
-                profit: 0,
-                loss: 0,
-                difference: 0,
-            }
+            grouped[key] = { month: `${year}-${month}`, broker: r.broker, profit: 0, loss: 0, difference: 0 }
         }
         grouped[key].profit += r.profit
         grouped[key].loss += r.loss
         grouped[key].difference += r.difference
     }
 
-    for (const key in grouped) monthlySummary.push(grouped[key])
-    monthlySummary.sort((a, b) => a.month.localeCompare(b.month))
+    const monthlySummary = Object.values(grouped).sort((a, b) => a.month.localeCompare(b.month))
+    const filteredSummary = selectedMonth
+        ? monthlySummary.filter(
+            s =>
+                s.month ===
+                `${selectedMonth.getFullYear()}-${String(selectedMonth.getMonth() + 1).padStart(2, '0')}`,
+        )
+        : monthlySummary
 
     return (
-        <div style={{ padding: '2rem', maxWidth: 1000, margin: '0 auto' }}>
-            <h1>Учёт прибыли и убытков</h1>
+        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ru}>
+            <Container maxWidth="md" sx={{ py: 4 }}>
+                <Typography variant="h4" gutterBottom className={'logo'}>
+                    Signal Metrics
+                </Typography>
 
-            {/* --- Кнопки импорта/экспорта --- */}
-            <div style={{ marginBottom: '1rem' }}>
-                <button onClick={handleExport}>📤 Экспорт данных</button>
-                <label style={{ marginLeft: '1rem', cursor: 'pointer' }}>
-                    📥 Импорт данных
-                    <input type="file" accept="application/json" onChange={handleImport} style={{ display: 'none' }} />
-                </label>
-            </div>
+                {/* === Форма === */}
+                <Paper sx={{ p: 2, mb: 3 }} className={'form'}>
+                    <Stack spacing={2} direction="row" flexWrap="wrap" className={'form-inner'}>
+                        <DatePicker
+                            label="Date"
+                            value={date}
+                            onChange={newDate => setDate(newDate)}
+                            format="dd.MM.yyyy"
+                            slots={{ openPickerIcon: WhiteCalendarIcon }}
+                            slotProps={{
+                                textField: {
+                                    variant: 'outlined',
+                                    sx: whiteTextField,
+                                },
+                            }}
+                        />
 
-            {/* --- Форма --- */}
-            <div style={{ display: 'grid', gap: '1rem', marginBottom: '1rem' }}>
-                <label>
-                    Дата: <input type="date" value={date} onChange={e => setDate(e.target.value)} />
-                </label>
+                        <FormControl sx={{ minWidth: 120 }}>
+                            <InputLabel>Signal</InputLabel>
+                            <Select value={broker} label="Signal" onChange={e => setBroker(e.target.value)}>
+                                <MenuItem value="Insider trade">Insider trade</MenuItem>
+                                <MenuItem value="CB Mark">CB Mark</MenuItem>
+                                <MenuItem value="CB Daniil N">CB Daniil N</MenuItem>
+                                <MenuItem value="CB Daniil E">CB Daniil E</MenuItem>
+                                <MenuItem value="Tuzemoon">Tuzemoon</MenuItem>
+                                <MenuItem value="Rocket vallet">Rocket vallet</MenuItem>
+                            </Select>
+                        </FormControl>
 
-                <label>
-                    Брокер:{' '}
-                    <select value={broker} onChange={e => setBroker(e.target.value)}>
-                        <option>Брокер 1</option>
-                        <option>Брокер 2</option>
-                        <option>Брокер 3</option>
-                    </select>
-                </label>
+                        <div className={'summa'}>
+                            <FormControlLabel
+                                control={<Checkbox checked={isProfit} onChange={() => setIsProfit(p => !p)}/>}
+                                label="Profit"
+                            />
 
-                <label>
-                    <input type="checkbox" checked={isProfit} onChange={() => setIsProfit(p => !p)} /> Прибыль
-                </label>
+                            <TextField
+                                label="Sum"
+                                placeholder="Example. 123,45"
+                                value={amount}
+                                onChange={e => setAmount(e.target.value)}
+                                sx={whiteTextField}
+                            />
+                        </div>
 
-                <label>
-                    Сумма:{' '}
-                    <input
-                        type="text"
-                        placeholder="Напр. 123,45"
-                        value={amount}
-                        onChange={e => setAmount(e.target.value)}
+                        <Button variant="contained" onClick={handleAdd}>
+                            ADD
+                        </Button>
+                    </Stack>
+                </Paper>
+
+                {/* === Таблица текущего месяца === */}
+                <Typography variant="h6" gutterBottom>
+                    Current month
+                </Typography>
+                <Paper sx={{ mb: 4 }}>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Date</TableCell>
+                                <TableCell>Signal</TableCell>
+                                <TableCell>Profit</TableCell>
+                                <TableCell>Loss</TableCell>
+                                <TableCell>Diff</TableCell>
+                                <TableCell></TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {currentMonthRecords.map((r, i) => (
+                                <TableRow key={i}>
+                                    <TableCell>{formatDate(r.date).slice(0, -5)}</TableCell>
+                                    <TableCell>{r.broker}</TableCell>
+                                    <TableCell sx={{ color: 'green' }}>{r.profit || '-'}</TableCell>
+                                    <TableCell sx={{ color: 'red' }}>{r.loss || '-'}</TableCell>
+                                    <TableCell>{r.difference}</TableCell>
+                                    <TableCell>
+                                        <Button
+                                            variant="outlined"
+                                            color="error"
+                                            size="small"
+                                            onClick={() => handleDelete(i)}
+                                            startIcon={<Delete/>}
+                                        />
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                        <TableFooter>
+                            <TableRow>
+                                <TableCell colSpan={2} sx={{ fontWeight: 'bold' }}>
+                                    Total:
+                                </TableCell>
+                                <TableCell sx={{ color: 'green' }}>{totalProfit.toFixed(2)}</TableCell>
+                                <TableCell sx={{ color: 'red' }}>{totalLoss.toFixed(2)}</TableCell>
+                                <TableCell>{totalDiff.toFixed(2)}</TableCell>
+                                <TableCell/>
+                            </TableRow>
+                        </TableFooter>
+                    </Table>
+                </Paper>
+
+                {/* === Фильтр === */}
+                <Stack direction="row" spacing={2} alignItems="center" mb={2}>
+                    <DatePicker
+                        label="Filter"
+                        views={['year', 'month']}
+                        value={selectedMonth}
+                        onChange={newDate => setSelectedMonth(newDate)}
+                        format="MM.yyyy"
+                        slots={{ openPickerIcon: WhiteCalendarIcon }}
+                        slotProps={{
+                            textField: {
+                                variant: 'outlined',
+                                sx: whiteTextField,
+                            },
+                        }}
                     />
-                </label>
+                    {selectedMonth && (
+                        <Button onClick={() => setSelectedMonth(null)} color="secondary">
+                            Clear
+                        </Button>
+                    )}
+                </Stack>
 
-                <button onClick={handleAdd}>Добавить</button>
-            </div>
+                {/* === Подбивка === */}
+                <Typography variant="h6" gutterBottom>
+                    Amount by month
+                </Typography>
+                <Paper sx={{ mb: 4 }}>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Date</TableCell>
+                                <TableCell>Signal</TableCell>
+                                <TableCell>Profit</TableCell>
+                                <TableCell>Loss</TableCell>
+                                <TableCell>Diff</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {filteredSummary.map((m, i) => (
+                                <TableRow key={i}>
+                                    <TableCell>{formatDate(`${m.month}-01`).slice(0, -5)}</TableCell>
+                                    <TableCell>{m.broker}</TableCell>
+                                    <TableCell sx={{ color: 'green' }}>{m.profit.toFixed(2)}</TableCell>
+                                    <TableCell sx={{ color: 'red' }}>{m.loss.toFixed(2)}</TableCell>
+                                    <TableCell>{m.difference.toFixed(2)}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </Paper>
 
-            {/* --- Основная таблица --- */}
-            {records.length === 0 ? (
-                <p>Нет данных</p>
-            ) : (
-                <>
-                    <h2>Все записи</h2>
-                    <table border={1} cellPadding={6} style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'center', marginBottom: '2rem' }}>
-                        <thead>
-                        <tr>
-                            <th>Дата</th>
-                            <th>Брокер</th>
-                            <th>Прибыль</th>
-                            <th>Убыток</th>
-                            <th>Разница</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {records.map((r, i) => (
-                            <tr key={i}>
-                                <td>{formatDate(r.date)}</td>
-                                <td>{r.broker}</td>
-                                <td style={{ color: 'green' }}>{r.profit || '-'}</td>
-                                <td style={{ color: 'red' }}>{r.loss || '-'}</td>
-                                <td>{r.difference}</td>
-                            </tr>
-                        ))}
-                        </tbody>
-                        <tfoot>
-                        <tr style={{ fontWeight: 'bold' }}>
-                            <td colSpan={2}>Итого:</td>
-                            <td style={{ color: 'green' }}>{totalProfit.toFixed(2)}</td>
-                            <td style={{ color: 'red' }}>{totalLoss.toFixed(2)}</td>
-                            <td>{totalDiff.toFixed(2)}</td>
-                        </tr>
-                        </tfoot>
-                    </table>
-
-                    {/* --- Сводка по месяцам --- */}
-                    <h2>Сводка по месяцам и брокерам</h2>
-                    <table border={1} cellPadding={6} style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'center' }}>
-                        <thead>
-                        <tr>
-                            <th>Месяц</th>
-                            <th>Брокер</th>
-                            <th>Прибыль</th>
-                            <th>Убыток</th>
-                            <th>Разница</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {monthlySummary.map((m, i) => (
-                            <tr key={i}>
-                                <td>{m.month.split('-').reverse().join('.')}</td>
-                                <td>{m.broker}</td>
-                                <td style={{ color: 'green' }}>{m.profit.toFixed(2)}</td>
-                                <td style={{ color: 'red' }}>{m.loss.toFixed(2)}</td>
-                                <td>{m.difference.toFixed(2)}</td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
-                </>
-            )}
-        </div>
+                {/* === Импорт/экспорт === */}
+                <Stack direction="row" spacing={2} mb={2}>
+                    <Button variant="contained" startIcon={<Download/>} onClick={handleExport}>
+                        Export Data
+                    </Button>
+                    <Button variant="contained" component="label" startIcon={<Upload/>}>
+                        Import Data
+                        <input type="file" accept="application/json" hidden onChange={handleImport}/>
+                    </Button>
+                </Stack>
+            </Container>
+        </LocalizationProvider>
     )
 }
 
