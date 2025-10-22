@@ -9,9 +9,9 @@ export default defineConfig({
             registerType: 'autoUpdate',
             includeAssets: ['favicon.ico', 'robots.txt'],
             manifest: {
-                name: 'My PWA App',
-                short_name: 'PWA App',
-                description: 'React + Vite + PWA example',
+                name: 'Signal metrics',
+                short_name: 'SM',
+                description: 'Signal metrics',
                 theme_color: '#ffffff',
                 background_color: '#ffffff',
                 display: 'standalone',
