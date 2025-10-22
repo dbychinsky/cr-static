@@ -6,7 +6,6 @@ import {
     Button,
     Select,
     MenuItem,
-    Checkbox,
     FormControlLabel,
     InputLabel,
     FormControl,
@@ -21,6 +20,9 @@ import {
     Tabs,
     Tab,
     Box,
+    Radio,
+    RadioGroup,
+    Checkbox,
 } from '@mui/material'
 import { Delete, Upload, Download, CalendarToday } from '@mui/icons-material'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
@@ -74,7 +76,8 @@ const App: React.FC = () => {
     const [records, setRecords] = useState<TradeRecord[]>([])
     const [selectedMonth, setSelectedMonth] = useState<Date | null>(new Date())
     const [tab, setTab] = useState(0)
-
+    const [showTodayOnly, setShowTodayOnly] = useState(false)
+    const [selectedBrokerFilter, setSelectedBrokerFilter] = useState('')
 
     const formatDate = (iso: string) => {
         if (!iso) return ''
@@ -146,7 +149,17 @@ const App: React.FC = () => {
     }
 
     const currentMonth = getCurrentMonth()
-    const currentMonthRecords = records.filter(r => r.date.startsWith(currentMonth))
+    let currentMonthRecords = records.filter(r => r.date.startsWith(currentMonth))
+
+    if (showTodayOnly) {
+        const today = new Date().toISOString().split('T')[0]
+        currentMonthRecords = currentMonthRecords.filter(r => r.date === today)
+    }
+
+    if (selectedBrokerFilter) {
+        currentMonthRecords = currentMonthRecords.filter(r => r.broker === selectedBrokerFilter)
+    }
+
     const totalProfit = currentMonthRecords.reduce((s, r) => s + r.profit, 0)
     const totalLoss = currentMonthRecords.reduce((s, r) => s + r.loss, 0)
     const totalDiff = totalProfit - totalLoss
@@ -172,9 +185,17 @@ const App: React.FC = () => {
         )
         : monthlySummary
 
+    const uniqueBrokers = Array.from(new Set(records.map(r => r.broker)))
+
+    const renderDiff = (value: number) => {
+        if (value > 0) return <span style={{ color: '#04ad04' }}>+{value.toFixed(2)}</span>
+        if (value < 0) return <span style={{ color: 'red' }}>{value.toFixed(2)}</span>
+        return <span style={{ color: 'white' }}>{value.toFixed(2)}</span>
+    }
+
     return (
         <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ru}>
-            <Container maxWidth="md" sx={{ py: 4 }} className={"main-wrapper"}>
+            <Container maxWidth="md" sx={{ py: 4 }} className="main-wrapper">
                 <Typography variant="h4" gutterBottom className="logo">
                     Signal Metrics
                 </Typography>
@@ -206,10 +227,23 @@ const App: React.FC = () => {
                         </FormControl>
 
                         <div className="summa">
-                            <FormControlLabel
-                                control={<Checkbox checked={isProfit} onChange={() => setIsProfit(p => !p)}/>}
-                                label="Profit"
-                            />
+                            <RadioGroup
+                                row
+                                value={isProfit ? 'profit' : 'loss'}
+                                onChange={e => setIsProfit(e.target.value === 'profit')}
+                                className="radio-group"
+                            >
+                                <FormControlLabel
+                                    value="profit"
+                                    control={<Radio sx={{ color: '#04ad04', '&.Mui-checked': { color: '#04ad04' } }}/>}
+                                    label={<span style={{ color: isProfit ? '#04ad04' : '#aaa' }}>Profit</span>}
+                                />
+                                <FormControlLabel
+                                    value="loss"
+                                    control={<Radio sx={{ color: '#ff3131', '&.Mui-checked': { color: '#ff3131' } }}/>}
+                                    label={<span style={{ color: !isProfit ? '#ff3131' : '#aaa' }}>Loss</span>}
+                                />
+                            </RadioGroup>
 
                             <TextField
                                 label="Sum"
@@ -217,6 +251,7 @@ const App: React.FC = () => {
                                 value={amount}
                                 onChange={e => setAmount(e.target.value)}
                                 sx={whiteTextField}
+                                className={"sum-input"}
                             />
                         </div>
 
@@ -234,7 +269,7 @@ const App: React.FC = () => {
                         textColor="primary"
                         indicatorColor="primary"
                         centered
-                        className={"tabs-head"}
+                        className="tabs-head"
                     >
                         <Tab label="Current month"/>
                         <Tab label="Monthly summary"/>
@@ -243,7 +278,35 @@ const App: React.FC = () => {
                     <Box sx={{ p: 2 }}>
                         {tab === 0 && (
                             <>
-                                <Table className={"table"}>
+                                <Stack direction="row" spacing={2} alignItems="center" mb={2}
+                                       className="filters-current-month">
+                                    <FormControl sx={{ minWidth: 180 }} className="custom-select">
+                                        <InputLabel>Signal</InputLabel>
+                                        <Select
+                                            value={selectedBrokerFilter}
+                                            label="Signal"
+                                            onChange={(e) => setSelectedBrokerFilter(e.target.value)}
+                                            className="control"
+                                        >
+                                            <MenuItem value="">All</MenuItem>
+                                            {uniqueBrokers.map(b => (
+                                                <MenuItem key={b} value={b}>{b}</MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                    <FormControlLabel
+                                        className="custom-check"
+                                        control={
+                                            <Checkbox
+                                                checked={showTodayOnly}
+                                                onChange={(e) => setShowTodayOnly(e.target.checked)}
+                                            />
+                                        }
+                                        label="Today"
+                                    />
+                                </Stack>
+
+                                <Table className="table">
                                     <TableHead>
                                         <TableRow>
                                             <TableCell>Date</TableCell>
@@ -259,12 +322,17 @@ const App: React.FC = () => {
                                             <TableRow key={i}>
                                                 <TableCell>{formatDate(r.date).slice(0, -5)}</TableCell>
                                                 <TableCell>{r.broker}</TableCell>
-                                                <TableCell sx={{ color: 'green' }}>{r.profit || '-'}</TableCell>
-                                                <TableCell sx={{ color: 'red' }}>{r.loss || '-'}</TableCell>
-                                                <TableCell>{r.difference}</TableCell>
+                                                <TableCell sx={{ color: '#bdd9bf' }}>
+                                                    {r.profit ? r.profit.toFixed(2) : '-'}
+                                                </TableCell>
+                                                <TableCell sx={{ color: '#dba3a3' }}>
+                                                    {r.loss ? `-${r.loss.toFixed(2)}` : '-'}
+                                                </TableCell>
+                                                <TableCell
+                                                    style={{ fontWeight: "bold" }}>{renderDiff(r.difference)}</TableCell>
                                                 <TableCell>
                                                     <Button
-                                                        className={'delete'}
+                                                        className="delete"
                                                         variant="outlined"
                                                         color="error"
                                                         size="small"
@@ -280,9 +348,9 @@ const App: React.FC = () => {
                                             <TableCell colSpan={2} sx={{ fontWeight: 'bold' }}>
                                                 Total:
                                             </TableCell>
-                                            <TableCell sx={{ color: 'green' }}>{totalProfit.toFixed(2)}</TableCell>
-                                            <TableCell sx={{ color: 'red' }}>{totalLoss.toFixed(2)}</TableCell>
-                                            <TableCell>{totalDiff.toFixed(2)}</TableCell>
+                                            <TableCell sx={{ color: '#bdd9bf' }}>{totalProfit.toFixed(2)}</TableCell>
+                                            <TableCell sx={{ color: '#dba3a3' }}>-{totalLoss.toFixed(2)}</TableCell>
+                                            <TableCell>{renderDiff(totalDiff)}</TableCell>
                                             <TableCell/>
                                         </TableRow>
                                     </TableFooter>
@@ -311,7 +379,7 @@ const App: React.FC = () => {
                                     )}
                                 </Stack>
 
-                                <Table className={"table"}>
+                                <Table className="table">
                                     <TableHead>
                                         <TableRow>
                                             <TableCell>Date</TableCell>
@@ -326,9 +394,9 @@ const App: React.FC = () => {
                                             <TableRow key={i}>
                                                 <TableCell>{formatDate(`${m.month}-01`).slice(3)}</TableCell>
                                                 <TableCell>{m.broker}</TableCell>
-                                                <TableCell sx={{ color: 'green' }}>{m.profit.toFixed(2)}</TableCell>
-                                                <TableCell sx={{ color: 'red' }}>{m.loss.toFixed(2)}</TableCell>
-                                                <TableCell>{m.difference.toFixed(2)}</TableCell>
+                                                <TableCell sx={{ color: '#bdd9bf' }}>{m.profit.toFixed(2)}</TableCell>
+                                                <TableCell sx={{ color: '#dba3a3' }}>-{m.loss.toFixed(2)}</TableCell>
+                                                <TableCell>{renderDiff(m.difference)}</TableCell>
                                             </TableRow>
                                         ))}
                                     </TableBody>
@@ -339,7 +407,7 @@ const App: React.FC = () => {
                 </Paper>
 
                 {/* === Импорт/экспорт === */}
-                <Stack direction="row" spacing={2} mb={2} className={"actionBar"}>
+                <Stack direction="row" spacing={2} mb={2} className="actionBar">
                     <Button variant="contained" startIcon={<Download/>} onClick={handleExport}>
                         Export Data
                     </Button>

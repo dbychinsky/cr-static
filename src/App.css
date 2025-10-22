@@ -61,3 +61,36 @@ h4 {
 .tabs-head {
     margin-bottom: 10px;
 }
+
+.filters-current-month {
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+.custom-select {
+    min-width: 206px !important;
+}
+
+.custom-check {
+    .MuiTypography-root {
+        font-size: 16px;
+    }
+}
+
+.radio-group {
+    .MuiRadio-root {
+        padding: 2px 7px 4px 10px !important;
+    }
+}
+
+.MuiBox-root {
+    padding: 12px !important;
+}
+
+.sum-input {
+    min-width: 320px;
+}
+
+.Mui-selected {
+    color: #7ba1c7 !important;
+}
