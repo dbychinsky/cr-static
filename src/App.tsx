@@ -174,7 +174,7 @@ const App: React.FC = () => {
 
     return (
         <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ru}>
-            <Container maxWidth="md" sx={{ py: 4 }}>
+            <Container maxWidth="md" sx={{ py: 4 }} className={"main-wrapper"}>
                 <Typography variant="h4" gutterBottom className="logo">
                     Signal Metrics
                 </Typography>
@@ -207,7 +207,7 @@ const App: React.FC = () => {
 
                         <div className="summa">
                             <FormControlLabel
-                                control={<Checkbox checked={isProfit} onChange={() => setIsProfit(p => !p)} />}
+                                control={<Checkbox checked={isProfit} onChange={() => setIsProfit(p => !p)}/>}
                                 label="Profit"
                             />
 
@@ -234,18 +234,16 @@ const App: React.FC = () => {
                         textColor="primary"
                         indicatorColor="primary"
                         centered
+                        className={"tabs-head"}
                     >
-                        <Tab label="Current month" />
-                        <Tab label="Monthly summary" />
+                        <Tab label="Current month"/>
+                        <Tab label="Monthly summary"/>
                     </Tabs>
 
                     <Box sx={{ p: 2 }}>
                         {tab === 0 && (
                             <>
-                                <Typography variant="h6" gutterBottom>
-                                    Current month
-                                </Typography>
-                                <Table>
+                                <Table className={"table"}>
                                     <TableHead>
                                         <TableRow>
                                             <TableCell>Date</TableCell>
@@ -253,7 +251,7 @@ const App: React.FC = () => {
                                             <TableCell>Profit</TableCell>
                                             <TableCell>Loss</TableCell>
                                             <TableCell>Diff</TableCell>
-                                            <TableCell />
+                                            <TableCell/>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -266,11 +264,12 @@ const App: React.FC = () => {
                                                 <TableCell>{r.difference}</TableCell>
                                                 <TableCell>
                                                     <Button
+                                                        className={'delete'}
                                                         variant="outlined"
                                                         color="error"
                                                         size="small"
                                                         onClick={() => handleDelete(i)}
-                                                        startIcon={<Delete />}
+                                                        startIcon={<Delete/>}
                                                     />
                                                 </TableCell>
                                             </TableRow>
@@ -284,7 +283,7 @@ const App: React.FC = () => {
                                             <TableCell sx={{ color: 'green' }}>{totalProfit.toFixed(2)}</TableCell>
                                             <TableCell sx={{ color: 'red' }}>{totalLoss.toFixed(2)}</TableCell>
                                             <TableCell>{totalDiff.toFixed(2)}</TableCell>
-                                            <TableCell />
+                                            <TableCell/>
                                         </TableRow>
                                     </TableFooter>
                                 </Table>
@@ -312,10 +311,7 @@ const App: React.FC = () => {
                                     )}
                                 </Stack>
 
-                                <Typography variant="h6" gutterBottom>
-                                    Amount by month
-                                </Typography>
-                                <Table>
+                                <Table className={"table"}>
                                     <TableHead>
                                         <TableRow>
                                             <TableCell>Date</TableCell>
@@ -328,7 +324,7 @@ const App: React.FC = () => {
                                     <TableBody>
                                         {filteredSummary.map((m, i) => (
                                             <TableRow key={i}>
-                                                <TableCell>{formatDate(`${m.month}-01`).slice(0, -5)}</TableCell>
+                                                <TableCell>{formatDate(`${m.month}-01`).slice(3)}</TableCell>
                                                 <TableCell>{m.broker}</TableCell>
                                                 <TableCell sx={{ color: 'green' }}>{m.profit.toFixed(2)}</TableCell>
                                                 <TableCell sx={{ color: 'red' }}>{m.loss.toFixed(2)}</TableCell>
@@ -343,13 +339,13 @@ const App: React.FC = () => {
                 </Paper>
 
                 {/* === Импорт/экспорт === */}
-                <Stack direction="row" spacing={2} mb={2}>
-                    <Button variant="contained" startIcon={<Download />} onClick={handleExport}>
+                <Stack direction="row" spacing={2} mb={2} className={"actionBar"}>
+                    <Button variant="contained" startIcon={<Download/>} onClick={handleExport}>
                         Export Data
                     </Button>
-                    <Button variant="contained" component="label" startIcon={<Upload />}>
+                    <Button variant="contained" component="label" startIcon={<Upload/>}>
                         Import Data
-                        <input type="file" accept="application/json" hidden onChange={handleImport} />
+                        <input type="file" accept="application/json" hidden onChange={handleImport}/>
                     </Button>
                 </Stack>
             </Container>

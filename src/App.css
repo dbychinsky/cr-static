@@ -3,26 +3,24 @@ h4 {
     margin-bottom: 10px !important;
 }
 
-h6 {
-    font-size: 16px !important;
-    margin-bottom: 10px !important;
+.logo {
+    padding-left: 34px;
+    background: url("assets/logotype.png") -5px -5px no-repeat;
+    background-size: 36px;
+
 }
 
-.css-ds0qfq-MuiContainer-root {
+.main-wrapper {
     padding: 20px 10px !important;
 }
-
-.css-1lid6ur-MuiPaper-root {
-    margin-bottom: 16px !important;
-}
-
 
 .form {
     max-width: 360px !important;
     width: 100% !important;
+    margin-bottom: 16px !important;
 }
 
-.css-1f89vao-MuiStack-root {
+.form-inner {
     display: flex !important;
     flex-flow: column nowrap !important;
     gap: 20px;
@@ -31,42 +29,35 @@ h6 {
 .summa {
     display: flex !important;
     flex-flow: row nowrap !important;
+    margin-left: 0 !important;
 }
 
-.css-1f89vao-MuiStack-root > :not(style) ~ :not(style) {
-    margin: 0 !important;
-}
-
-.css-cie2x-MuiTableCell-root {
+.MuiTableCell-root {
     padding: 8px !important;
     font-size: 12px !important;
 }
 
-.css-1oa658l-MuiTableCell-root,
-.css-dcstex-MuiTableCell-root,
-.css-1lwn3zq-MuiTableCell-root,
-.css-12x85rv-MuiTableCell-root,
-.css-qkz8se-MuiTableCell-root,
-.css-107qrd1-MuiTableCell-root,
-.css-gwwvla-MuiTableCell-root {
-    padding: 8px 4px 8px 8px !important;
-    font-size: 12px !important;
-}
-
-
-.css-5imdd-MuiButtonBase-root-MuiButton-root {
+.delete {
     min-width: 0 !important;
     padding: 3px !important;
     border: none !important;
 }
 
-button.css-5imdd-MuiButtonBase-root-MuiButton-root {
-    padding-left: 0 !important;
+.MuiBox-root {
+    padding: 10px;
 }
 
-.logo {
-    padding-left: 34px;
-    background: url("assets/logotype.png") -5px -5px  no-repeat;
-    background-size: 36px;
+.MuiFormControl-root, .MuiButtonBase-root {
+    margin: 0 !important;
+}
 
+.actionBar {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.tabs-head {
+    margin-bottom: 10px;
 }
