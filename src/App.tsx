@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import {
     Container,
     Typography,
@@ -22,8 +21,7 @@ import {
     Box,
     Radio,
     RadioGroup,
-    Tooltip,
-    IconButton, FormControlLabel,
+    FormControlLabel,
 } from '@mui/material';
 import { Delete, Upload, Download, CalendarToday } from '@mui/icons-material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -241,12 +239,12 @@ const App: React.FC = () => {
                             >
                                 <FormControlLabel
                                     value="profit"
-                                    control={<Radio sx={{ color: '#04ad04', '&.Mui-checked': { color: '#04ad04' } }} />}
+                                    control={<Radio sx={{ color: '#04ad04', '&.Mui-checked': { color: '#04ad04' } }}/>}
                                     label={<span style={{ color: isProfit ? '#04ad04' : '#aaa' }}>Profit</span>}
                                 />
                                 <FormControlLabel
                                     value="loss"
-                                    control={<Radio sx={{ color: '#ff3131', '&.Mui-checked': { color: '#ff3131' } }} />}
+                                    control={<Radio sx={{ color: '#ff3131', '&.Mui-checked': { color: '#ff3131' } }}/>}
                                     label={<span style={{ color: !isProfit ? '#ff3131' : '#aaa' }}>Loss</span>}
                                 />
                             </RadioGroup>
@@ -286,14 +284,15 @@ const App: React.FC = () => {
                         centered
                         className="tabs-head"
                     >
-                        <Tab label="Current month" />
-                        <Tab label="Monthly summary" />
+                        <Tab label="Current month"/>
+                        <Tab label="Monthly summary"/>
                     </Tabs>
 
                     <Box sx={{ p: 2 }}>
                         {tab === 0 && (
                             <>
-                                <Stack direction="row" spacing={2} alignItems="center" mb={2} className="filters-current-month">
+                                <Stack direction="row" spacing={2} alignItems="center" mb={2}
+                                       className="filters-current-month">
                                     <FormControl sx={{ minWidth: 180 }} className="custom-select">
                                         <InputLabel>Signal</InputLabel>
                                         <Select
@@ -329,25 +328,16 @@ const App: React.FC = () => {
                                 <Table className="table">
                                     <TableHead>
                                         <TableRow>
-                                            <TableCell>Date</TableCell>
+                                            <TableCell>D</TableCell>
                                             <TableCell>Signal</TableCell>
                                             <TableCell>Profit</TableCell>
                                             <TableCell>Loss</TableCell>
                                             <TableCell>Diff</TableCell>
                                             <TableCell>
-                                                ROI (%)
-                                                <Tooltip
-                                                    title="ROI (Return on Investment) показывает процент доходности сделки относительно вложенных средств. Считается как прибыль или убыток, делённые на вложение, умноженные на 100."
-                                                    arrow
-                                                    placement="top"
-                                                >
-                                                    <IconButton size="small" sx={{ ml: 0.5, color: '#bbb' }}>
-                                                        <InfoOutlinedIcon fontSize="small" />
-                                                    </IconButton>
-                                                </Tooltip>
+                                                ROI %
                                             </TableCell>
 
-                                            <TableCell />
+                                            <TableCell/>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -355,10 +345,13 @@ const App: React.FC = () => {
                                             <TableRow key={i}>
                                                 <TableCell>{formatDate(r.date).slice(0, -8)}</TableCell>
                                                 <TableCell>{r.broker}</TableCell>
-                                                <TableCell sx={{ color: '#bdd9bf' }}>{r.profit ? r.profit.toFixed(2) : '-'}</TableCell>
-                                                <TableCell sx={{ color: '#dba3a3' }}>{r.loss ? `-${r.loss.toFixed(2)}` : '-'}</TableCell>
-                                                <TableCell style={{ fontWeight: 'bold' }}>{renderDiff(r.difference)}</TableCell>
-                                                <TableCell>{r.roi !== undefined ? `${r.roi > 0 ? '+' : ''}${r.roi.toFixed(2)}%` : '-'}</TableCell>
+                                                <TableCell
+                                                    sx={{ color: '#bdd9bf' }}>{r.profit ? r.profit.toFixed(2) : '-'}</TableCell>
+                                                <TableCell
+                                                    sx={{ color: '#dba3a3' }}>{r.loss ? `-${r.loss.toFixed(2)}` : '-'}</TableCell>
+                                                <TableCell
+                                                    style={{ fontWeight: 'bold' }}>{renderDiff(r.difference)}</TableCell>
+                                                <TableCell>{r.roi !== undefined ? `${r.roi > 0 ? '+' : ''}${r.roi.toFixed(2)}` : '-'}</TableCell>
                                                 <TableCell>
                                                     <Button
                                                         className="delete"
@@ -366,7 +359,7 @@ const App: React.FC = () => {
                                                         color="error"
                                                         size="small"
                                                         onClick={() => handleDelete(i)}
-                                                        startIcon={<Delete />}
+                                                        startIcon={<Delete/>}
                                                     />
                                                 </TableCell>
                                             </TableRow>
@@ -380,8 +373,8 @@ const App: React.FC = () => {
                                             <TableCell sx={{ color: '#bdd9bf' }}>{totalProfit.toFixed(2)}</TableCell>
                                             <TableCell sx={{ color: '#dba3a3' }}>-{totalLoss.toFixed(2)}</TableCell>
                                             <TableCell>{renderDiff(totalDiff)}</TableCell>
-                                            <TableCell>{totalRoi ? `${totalRoi.toFixed(2)}%` : '-'}</TableCell>
-                                            <TableCell />
+                                            <TableCell>{totalRoi ? `${totalRoi.toFixed(2)}` : '-'}</TableCell>
+                                            <TableCell/>
                                         </TableRow>
                                     </TableFooter>
                                 </Table>
@@ -412,7 +405,7 @@ const App: React.FC = () => {
                                 <Table className="table">
                                     <TableHead>
                                         <TableRow>
-                                            <TableCell>Month</TableCell>
+                                            <TableCell>M</TableCell>
                                             <TableCell>Signal</TableCell>
                                             <TableCell>Profit</TableCell>
                                             <TableCell>Loss</TableCell>
@@ -469,12 +462,12 @@ const App: React.FC = () => {
 
                 {/* === Импорт/экспорт === */}
                 <Stack direction="row" spacing={2} mb={2} className="actionBar">
-                    <Button variant="contained" startIcon={<Download />} onClick={handleExport}>
+                    <Button variant="contained" startIcon={<Download/>} onClick={handleExport}>
                         Export Data
                     </Button>
-                    <Button variant="contained" component="label" startIcon={<Upload />}>
+                    <Button variant="contained" component="label" startIcon={<Upload/>}>
                         Import Data
-                        <input type="file" accept="application/json" hidden onChange={handleImport} />
+                        <input type="file" accept="application/json" hidden onChange={handleImport}/>
                     </Button>
                 </Stack>
             </Container>

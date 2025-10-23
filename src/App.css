@@ -100,3 +100,8 @@ h4 {
 .Mui-selected {
     color: #7ba1c7 !important;
 }
+
+/* разрешаем тултипу вылезать за пределы таблицы */
+.table {
+    overflow: visible !important;   /* ← главное */
+}
