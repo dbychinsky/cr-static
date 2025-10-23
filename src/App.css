@@ -34,13 +34,14 @@ h4 {
 }
 
 .MuiTableCell-root {
-    padding: 8px !important;
-    font-size: 12px !important;
+    padding: 6px !important;
+    font-size: 11px !important;
 }
 
 .delete {
     min-width: 0 !important;
-    padding: 3px !important;
+    width: 17px !important;
+    padding: 0px !important;
     border: none !important;
 }
 
@@ -90,7 +91,7 @@ h4 {
 }
 
 .MuiBox-root {
-    padding: 12px !important;
+    padding: 10px !important;
 }
 
 .sum-input {
@@ -101,7 +102,6 @@ h4 {
     color: #7ba1c7 !important;
 }
 
-/* разрешаем тултипу вылезать за пределы таблицы */
-.table {
-    overflow: visible !important;   /* ← главное */
+.last-button {
+    padding: 0 0 0 4px !important;
 }

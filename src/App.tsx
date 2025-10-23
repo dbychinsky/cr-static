@@ -352,7 +352,7 @@ const App: React.FC = () => {
                                                 <TableCell
                                                     style={{ fontWeight: 'bold' }}>{renderDiff(r.difference)}</TableCell>
                                                 <TableCell>{r.roi !== undefined ? `${r.roi > 0 ? '+' : ''}${r.roi.toFixed(2)}` : '-'}</TableCell>
-                                                <TableCell>
+                                                <TableCell className={'last-button'}>
                                                     <Button
                                                         className="delete"
                                                         variant="outlined"
@@ -373,7 +373,7 @@ const App: React.FC = () => {
                                             <TableCell sx={{ color: '#bdd9bf' }}>{totalProfit.toFixed(2)}</TableCell>
                                             <TableCell sx={{ color: '#dba3a3' }}>-{totalLoss.toFixed(2)}</TableCell>
                                             <TableCell>{renderDiff(totalDiff)}</TableCell>
-                                            <TableCell>{totalRoi ? `${totalRoi.toFixed(2)}` : '-'}</TableCell>
+                                            <TableCell>{totalRoi ? `${totalRoi.toFixed(2)}%` : '-'}</TableCell>
                                             <TableCell/>
                                         </TableRow>
                                     </TableFooter>
@@ -423,7 +423,7 @@ const App: React.FC = () => {
                                                 <TableCell>{renderDiff(m.difference)}</TableCell>
                                                 <TableCell>
                                                     {m.profit + m.loss !== 0
-                                                        ? `${((m.difference / (m.profit + m.loss)) * 100).toFixed(2)}%`
+                                                        ? `${((m.difference / (m.profit + m.loss)) * 100).toFixed(2)}`
                                                         : '-'}
                                                 </TableCell>
                                             </TableRow>
