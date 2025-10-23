@@ -353,7 +353,7 @@ const App: React.FC = () => {
                                     <TableBody>
                                         {visibleRecords.map((r, i) => (
                                             <TableRow key={i}>
-                                                <TableCell>{formatDate(r.date).slice(0, -5)}</TableCell>
+                                                <TableCell>{formatDate(r.date).slice(0, -8)}</TableCell>
                                                 <TableCell>{r.broker}</TableCell>
                                                 <TableCell sx={{ color: '#bdd9bf' }}>{r.profit ? r.profit.toFixed(2) : '-'}</TableCell>
                                                 <TableCell sx={{ color: '#dba3a3' }}>{r.loss ? `-${r.loss.toFixed(2)}` : '-'}</TableCell>
@@ -412,7 +412,7 @@ const App: React.FC = () => {
                                 <Table className="table">
                                     <TableHead>
                                         <TableRow>
-                                            <TableCell>Date</TableCell>
+                                            <TableCell>Month</TableCell>
                                             <TableCell>Signal</TableCell>
                                             <TableCell>Profit</TableCell>
                                             <TableCell>Loss</TableCell>
@@ -423,7 +423,7 @@ const App: React.FC = () => {
                                     <TableBody>
                                         {filteredSummary.map((m, i) => (
                                             <TableRow key={i}>
-                                                <TableCell>{formatDate(`${m.month}-01`).slice(3)}</TableCell>
+                                                <TableCell>{formatDate(`${m.month}-01`).slice(3, 5)}</TableCell>
                                                 <TableCell>{m.broker}</TableCell>
                                                 <TableCell sx={{ color: '#bdd9bf' }}>{m.profit.toFixed(2)}</TableCell>
                                                 <TableCell sx={{ color: '#dba3a3' }}>-{m.loss.toFixed(2)}</TableCell>
