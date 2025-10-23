@@ -374,7 +374,11 @@ const App: React.FC = () => {
                                             <TableCell sx={{ color: '#dba3a3' }}>-{totalLoss.toFixed(2)}</TableCell>
                                             <TableCell>{renderDiff(totalDiff)}</TableCell>
                                             <TableCell>{totalRoi ? `${totalRoi.toFixed(2)}%` : '-'}</TableCell>
-                                            <TableCell/>
+                                            <TableCell sx={{ fontWeight: 'bold', color: '#04ad04' }}>
+                                                {visibleRecords.length
+                                                    ? `${((visibleRecords.filter(r => r.profit > 0).length / visibleRecords.length) * 100).toFixed(1)}%`
+                                                    : '-'}
+                                            </TableCell>
                                         </TableRow>
                                     </TableFooter>
                                 </Table>
