@@ -28,8 +28,9 @@ h4 {
 
 .summa {
     display: flex !important;
-    flex-flow: row nowrap !important;
+    flex-flow: column nowrap !important;
     margin-left: 0 !important;
+    gap: 20px !important;
 }
 
 .MuiTableCell-root {
@@ -65,10 +66,15 @@ h4 {
 .filters-current-month {
     display: flex;
     flex-flow: column nowrap;
+    gap: 2%;
 }
 
 .custom-select {
-    min-width: 206px !important;
+    min-width: 48% !important;
+}
+
+.custom-picker {
+    min-width: 48% !important;
 }
 
 .custom-check {
