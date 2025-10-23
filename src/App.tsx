@@ -460,6 +460,12 @@ const App: React.FC = () => {
                     </Box>
                 </Paper>
 
+                <Stack direction="row" className="roi">
+                    ROI (Return on Investment) показывает среднюю доходность сделок. Здесь отображается среднее
+                    арифметическое ROI по всем операциям месяца. Это оценка средней эффективности сигналов, а не
+                    реального роста капитала.
+                </Stack>
+
                 {/* === Импорт/экспорт === */}
                 <Stack direction="row" spacing={2} mb={2} className="actionBar">
                     <Button variant="contained" startIcon={<Download/>} onClick={handleExport}>

@@ -105,3 +105,9 @@ h4 {
 .last-button {
     padding: 0 0 0 4px !important;
 }
+
+.roi {
+    font-size: 12px;
+    line-height: 180%;
+    margin-bottom: 20px;
+}
